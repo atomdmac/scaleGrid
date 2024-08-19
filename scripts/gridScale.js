@@ -140,6 +140,7 @@ class ScaleGridLayer extends CanvasLayer {
           icon: "fas fa-undo",
           name: "ResetGridTool",
           title: "Reset the grid",
+          button: true,
           onClick: e => {
             this.resetDialog(e);
           }
