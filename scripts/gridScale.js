@@ -950,6 +950,8 @@ class ScaleGridLayer extends CanvasLayer {
   // Save the color and alpha of the current scene's grid.
   // We'll use this to reset it when the preview is toggled off. 
   saveGridSettings(sceneId) {
+    log(canvas.grid)
+
     gridScaler.cavasGridTempSettings[sceneId] = {
       visible: canvas.grid.visible,
       alpha: canvas.grid.grid.options.alpha,
