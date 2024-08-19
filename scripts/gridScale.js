@@ -426,9 +426,9 @@ class ScaleGridLayer extends CanvasLayer {
 
     switch (gridType) {
       case 1:
-        const closeTopL = canvas.grid.getTopLeft(mousePos.x, mousePos.y);
-        const oppX = closeTopL[0] + gridSize;
-        const absTopL = Math.abs(closeTopL[0] - mousePos.x);
+        const closeTopL = canvas.grid.getTopLeftPoint({ x: mousePos.x, y: mousePos.y });
+        const oppX = closeTopL.x + gridSize;
+        const absTopL = Math.abs(closeTopL.x - mousePos.x);
         const absTopR = Math.abs(oppX - mousePos.x);
 
         if (absTopL > absTopR) {
@@ -484,9 +484,9 @@ class ScaleGridLayer extends CanvasLayer {
 
     switch (gridType) {
       case 1:
-        const closeTopL = canvas.grid.getTopLeft(mousePos.x, mousePos.y);
-        const oppY = closeTopL[1] + gridSize;
-        const absTop = Math.abs(closeTopL[1] - mousePos.y);
+        const closeTopL = canvas.grid.getTopLeftPoint({ x: mousePos.x, y: mousePos.y });
+        const oppY = closeTopL.y + gridSize;
+        const absTop = Math.abs(closeTopL.y - mousePos.y);
         const absBot = Math.abs(oppY - mousePos.y);
 
         if (absTop < absBot) {
