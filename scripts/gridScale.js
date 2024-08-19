@@ -951,9 +951,9 @@ class ScaleGridLayer extends CanvasLayer {
   // We'll use this to reset it when the preview is toggled off. 
   saveGridSettings(sceneId) {
     gridScaler.cavasGridTempSettings[sceneId] = {
-      visible: canvas.grid.visible,
-      alpha: canvas.grid.grid.alpha,
-      color: canvas.grid.grid.color
+      visible: GridLayer.instance.visible,
+      alpha: GridLayer.instance.alpha,
+      color: GridLayer.instance.color
     };
   }
 
