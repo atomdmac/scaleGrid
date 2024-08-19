@@ -129,8 +129,9 @@ class ScaleGridLayer extends CanvasLayer {
         },
         {
           icon: 'fas fa-border-none',
-          name: "ToogleGridTool",
+          name: "ToggleGridTool",
           title: "Toggle the grid display temporarily",
+          toggle: true,
           onClick: gridScaler.toggleGrid
         },
         {
