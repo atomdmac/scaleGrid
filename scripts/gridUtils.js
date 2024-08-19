@@ -108,9 +108,9 @@ export class gridUtils {
     offsetY = null,
     offsetSize = null, // can't be smaller than 50
     alpha = 1.0,
-    color = "#FF0000"} = {}) {
+    color = "#FF0000" } = {}) {
 
-    const d = canvas.grid.grid.options.dimensions;
+    const d = canvas.dimensions;
 
     if (offsetSize) {
       d.size += offsetSize;
