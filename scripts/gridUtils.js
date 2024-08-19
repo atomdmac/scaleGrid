@@ -147,11 +147,12 @@ export class gridUtils {
 
     // Update the grid layer
     if (grid) {
-      canvas.interface.grid.initializeMesh({
+      canvas.interface.grid.mesh.initialize({
         dimensions: d,
+        size: d.size,
         color: Color.fromString(color.toString().replace("#", "0x")),
         alpha: alpha
-      });
+      })
 
       canvas.stage.hitArea = d.rect;
     }

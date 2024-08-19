@@ -5,7 +5,7 @@ import {
 /*
 **How to work with Foundry grids, a primer**
 
-When working on the grid, you generally want to access 'canvas.grid.grid'. That's going to be
+When working on the grid, you generally want to access 'canvas.grid'. That's going to be
 a different object depending on which type of grid is currently selected; SquareGrid, HexagonalGrid,
 or BaseGrid (gridless). 'canvas.grid' is the GridLayer, which we don't deal with here.
 
@@ -17,8 +17,8 @@ DIMENSIONS
 The scene grid is split into outer and inner panels, with the inner panel set inside and offset 
 from the outer panel (usually centered).
 
-- 'canvas.grid.grid.options' to get the dimensions and other information about the grid
-- 'canvas.dimensions' is a shortcut for 'canvas.grid.grid.options.dimensions'
+- 'canvas.grid.options' to get the dimensions and other information about the grid
+- 'canvas.dimensions' is a shortcut for 'canvas.grid.options.dimensions'
 
 Properties (v10):
   - alpha: 0.45
@@ -839,7 +839,7 @@ class ScaleGridLayer extends CanvasLayer {
     return setInterval(() => {
       const sceneX = canvas.dimensions.sceneX;
       const sceneY = canvas.dimensions.sceneY;
-      const snapPos = canvas.grid.grid.getSnappedPosition(sceneX, sceneY);
+      const snapPos = canvas.grid.getSnappedPoint(new PIXI.Point(sceneX, sceneY), { mode: CONST.GRID_SNAPPING_MODES.CENTER });
 
       gridUtils.refreshGrid({ background: true, offsetX: 0, offsetY: 0, offsetSize: gridOffset })
 
@@ -862,7 +862,7 @@ class ScaleGridLayer extends CanvasLayer {
   }
 
   refreshGridForResize(oldSnapPos, extraOffset) {
-    const newSnapPos = canvas.grid.grid.getSnappedPosition(canvas.dimensions.sceneX, canvas.dimensions.sceneY);
+    const newSnapPos = canvas.grid.getSnappedPoint(new PIXI.Point(canvas.dimensions.sceneX, canvas.dimensions.sceneY), { mode: CONST.GRID_SNAPPING_MODES.CENTER });
     const gridOffsetX = newSnapPos.x - oldSnapPos.x + extraOffset;
     const gridOffsetY = newSnapPos.y - oldSnapPos.y + extraOffset;
 
