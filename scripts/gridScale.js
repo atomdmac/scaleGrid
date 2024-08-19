@@ -119,12 +119,14 @@ class ScaleGridLayer extends CanvasLayer {
           icon: "fas fa-object-group",
           name: "MoveGridTool",
           title: "Move and scale the grid",
+          button: true,
           onClick: gridScaler.openGridMoveDialog
         },
         {
           icon: 'fas fa-pen-square',
           name: "ManualGridSizeTool",
           title: "Set the grid by number of squares or hexes",
+          button: true,
           onClick: gridScaler.openGridSizeDialog
         },
         {
