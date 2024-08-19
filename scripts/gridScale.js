@@ -5,7 +5,7 @@ import {
 /*
 **How to work with Foundry grids, a primer**
 
-When working on the grid, you generally want to access 'canvas.grid.grid'. That's going to be
+When working on the grid, you generally want to access 'canvas.grid'. That's going to be
 a different object depending on which type of grid is currently selected; SquareGrid, HexagonalGrid,
 or BaseGrid (gridless). 'canvas.grid' is the GridLayer, which we don't deal with here.
 
@@ -17,8 +17,8 @@ DIMENSIONS
 The scene grid is split into outer and inner panels, with the inner panel set inside and offset 
 from the outer panel (usually centered).
 
-- 'canvas.grid.grid.options' to get the dimensions and other information about the grid
-- 'canvas.dimensions' is a shortcut for 'canvas.grid.grid.options.dimensions'
+- 'canvas.grid.options' to get the dimensions and other information about the grid
+- 'canvas.dimensions' is a shortcut for 'canvas.grid.options.dimensions'
 
 Properties (v10):
   - alpha: 0.45
@@ -95,48 +95,56 @@ class ScaleGridLayer extends CanvasLayer {
           icon: "fas fa-square",
           name: "DrawGridTool",
           title: "Set grid by drawing either a square or hexagon",
+          button: true,
           onClick: gridScaler.setupDrawGrid
         },
         {
           icon: "fas fa-th",
           name: "Draw3x3Tool",
           title: "Set grid by drawing a 3x3 box",
+          button: true,
           onClick: gridScaler.setupDraw3X3
         },
         {
           icon: "fas fa-ruler-horizontal",
           name: "AdjustXTool",
           title: "Set the X position of the grid",
+          button: true,
           onClick: gridScaler.setupAdjustX
         },
         {
           icon: "fas fa-ruler-vertical",
           name: "AdjustYTool",
           title: "Set the Y position of the grid",
+          button: true,
           onClick: gridScaler.setupAdjustY
         },
         {
           icon: "fas fa-object-group",
           name: "MoveGridTool",
           title: "Move and scale the grid",
+          button: true,
           onClick: gridScaler.openGridMoveDialog
         },
         {
           icon: 'fas fa-pen-square',
           name: "ManualGridSizeTool",
           title: "Set the grid by number of squares or hexes",
+          button: true,
           onClick: gridScaler.openGridSizeDialog
         },
         {
           icon: 'fas fa-border-none',
-          name: "ToogleGridTool",
+          name: "ToggleGridTool",
           title: "Toggle the grid display temporarily",
+          toggle: true,
           onClick: gridScaler.toggleGrid
         },
         {
           icon: "fas fa-undo",
           name: "ResetGridTool",
           title: "Reset the grid",
+          button: true,
           onClick: e => {
             this.resetDialog(e);
           }
@@ -232,12 +240,14 @@ class ScaleGridLayer extends CanvasLayer {
   // <================== Start Setup Functions  ====================>
 
   setupAdjustX() {
+    ui.notifications.info("Click on a point to set up the X position of your grid");
     console.log("Grid Scale | Drawing Layer | Running AdjustX")
     gridScaler.currentTool = "AdjustXTool"
     gridScaler.addListeners();
   }
 
   setupAdjustY() {
+    ui.notifications.info("Click on a point to set up the Y position of your grid");
     console.log("Grid Scale | Drawing Layer | Running AdjustY")
     gridScaler.currentTool = "AdjustYTool"
     gridScaler.addListeners();
@@ -254,16 +264,19 @@ class ScaleGridLayer extends CanvasLayer {
   }
 
   setupDrawSquare() {
+    ui.notifications.info("Click and drag your mouse to draw a square");
     gridScaler.currentTool = "DrawSquareTool"
     gridScaler.initializeDrawGrid();
   }
 
   setupDrawHex() {
+    ui.notifications.info("Click and drag your mouse to draw an hexagon");
     gridScaler.currentTool = "DrawHexTool"
     gridScaler.initializeDrawGrid();
   }
 
   setupDraw3X3() {
+    ui.notifications.info("Click and drag your mouse to draw a box of 3 squares");
     gridScaler.currentTool = "Draw3x3Tool"
     gridScaler.initializeDrawGrid();
   }
@@ -425,9 +438,9 @@ class ScaleGridLayer extends CanvasLayer {
 
     switch (gridType) {
       case 1:
-        const closeTopL = canvas.grid.getTopLeft(mousePos.x, mousePos.y);
-        const oppX = closeTopL[0] + gridSize;
-        const absTopL = Math.abs(closeTopL[0] - mousePos.x);
+        const closeTopL = canvas.grid.getTopLeftPoint({ x: mousePos.x, y: mousePos.y });
+        const oppX = closeTopL.x + gridSize;
+        const absTopL = Math.abs(closeTopL.x - mousePos.x);
         const absTopR = Math.abs(oppX - mousePos.x);
 
         if (absTopL > absTopR) {
@@ -483,9 +496,9 @@ class ScaleGridLayer extends CanvasLayer {
 
     switch (gridType) {
       case 1:
-        const closeTopL = canvas.grid.getTopLeft(mousePos.x, mousePos.y);
-        const oppY = closeTopL[1] + gridSize;
-        const absTop = Math.abs(closeTopL[1] - mousePos.y);
+        const closeTopL = canvas.grid.getTopLeftPoint({ x: mousePos.x, y: mousePos.y });
+        const oppY = closeTopL.y + gridSize;
+        const absTop = Math.abs(closeTopL.y - mousePos.y);
         const absBot = Math.abs(oppY - mousePos.y);
 
         if (absTop < absBot) {
@@ -838,7 +851,7 @@ class ScaleGridLayer extends CanvasLayer {
     return setInterval(() => {
       const sceneX = canvas.dimensions.sceneX;
       const sceneY = canvas.dimensions.sceneY;
-      const snapPos = canvas.grid.grid.getSnappedPosition(sceneX, sceneY);
+      const snapPos = canvas.grid.getSnappedPoint(new PIXI.Point(sceneX, sceneY), { mode: CONST.GRID_SNAPPING_MODES.CENTER });
 
       gridUtils.refreshGrid({ background: true, offsetX: 0, offsetY: 0, offsetSize: gridOffset })
 
@@ -861,7 +874,7 @@ class ScaleGridLayer extends CanvasLayer {
   }
 
   refreshGridForResize(oldSnapPos, extraOffset) {
-    const newSnapPos = canvas.grid.grid.getSnappedPosition(canvas.dimensions.sceneX, canvas.dimensions.sceneY);
+    const newSnapPos = canvas.grid.getSnappedPoint(new PIXI.Point(canvas.dimensions.sceneX, canvas.dimensions.sceneY), { mode: CONST.GRID_SNAPPING_MODES.CENTER });
     const gridOffsetX = newSnapPos.x - oldSnapPos.x + extraOffset;
     const gridOffsetY = newSnapPos.y - oldSnapPos.y + extraOffset;
 
@@ -951,9 +964,9 @@ class ScaleGridLayer extends CanvasLayer {
   // We'll use this to reset it when the preview is toggled off. 
   saveGridSettings(sceneId) {
     gridScaler.cavasGridTempSettings[sceneId] = {
-      visible: canvas.grid.visible,
-      alpha: canvas.grid.grid.options.alpha,
-      color: canvas.grid.grid.options.color
+      visible: GridLayer.instance.visible,
+      alpha: GridLayer.instance.alpha,
+      color: GridLayer.instance.color
     };
   }
 

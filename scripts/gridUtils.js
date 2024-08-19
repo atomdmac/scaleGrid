@@ -20,7 +20,7 @@ export class gridUtils {
       // Older Foundry versions use the first case, newer versions (>v11) use the second.
       const interaction = canvas.app?.plugins?.interaction || canvas.app?.renderer?.plugins?.interaction;
       // Older versions of Foundry use mouse, newer versions (>v10) use pointer
-      const pointer = interaction.mouse || interaction.pointer;
+      const pointer = interaction?.mouse || interaction?.pointer || canvas.app.renderer.events.pointer;
       result = pointer.getLocalPosition(canvas.app.stage);
     }
 
@@ -108,9 +108,9 @@ export class gridUtils {
     offsetY = null,
     offsetSize = null, // can't be smaller than 50
     alpha = 1.0,
-    color = "#FF0000"} = {}) {
+    color = "#FF0000" } = {}) {
 
-    const d = canvas.grid.grid.options.dimensions;
+    const d = canvas.dimensions;
 
     if (offsetSize) {
       d.size += offsetSize;
@@ -147,11 +147,12 @@ export class gridUtils {
 
     // Update the grid layer
     if (grid) {
-      canvas.grid.grid.draw({
+      canvas.interface.grid.mesh.initialize({
         dimensions: d,
-        color: color.replace("#", "0x"),
+        size: d.size,
+        color: Color.fromString(color.toString().replace("#", "0x")),
         alpha: alpha
-      });
+      })
 
       canvas.stage.hitArea = d.rect;
     }
