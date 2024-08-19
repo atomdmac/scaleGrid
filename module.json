@@ -28,7 +28,7 @@
 	"styles": [
 		"./styles/gridStyle.css"
 	],
-	"url": "https://github.com/TheGoodwin/scaleGrid/",
-	"manifest": "https://raw.githubusercontent.com/TheGoodwin/scaleGrid/feature/compatibility-v12/module.json",
-	"download": "https://github.com/TheGoodwin/scaleGrid/archive/refs/heads/feature/compatibility-v12.zip"
+	"url": "https://github.com/atomdmac/scaleGrid/",
+	"manifest": "https://raw.githubusercontent.com/atomdmac/scaleGrid/master/module.json",
+	"download": "https://github.com/atomdmac/scaleGrid/archive/refs/tags/v1.4.4.zip"
 }
