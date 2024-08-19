@@ -1,11 +1,11 @@
 {
-	"id": "theGoodwinScaleGrid",
-	"title": "TheGoodwin's Grid Scaler",
+	"id": "scaleGrid",
+	"title": "Grid Scaler",
 	"description": "A set of tools to quickly match the scene grid to your map's grid. Works with both squares and hexes.",
 	"version": "1.4.5",
 	"compatibility": {
 		"minimum": 10,
-		"verified": "11"
+		"verified": "12"
 	},
 	"authors": [
 		{
