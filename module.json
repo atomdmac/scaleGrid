@@ -30,5 +30,5 @@
 	],
 	"url": "https://github.com/TheGoodwin/scaleGrid/",
 	"manifest": "https://raw.githubusercontent.com/TheGoodwin/scaleGrid/feature/compatibility-v12/module.json",
-	"download": "https://github.com/TheGoodwin/scaleGrid/archive/refs/tags/v1.4.5.zip"
+	"download": "https://github.com/TheGoodwin/scaleGrid/archive/refs/heads/feature/compatibility-v12.zip"
 }
