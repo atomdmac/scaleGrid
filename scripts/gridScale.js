@@ -95,24 +95,28 @@ class ScaleGridLayer extends CanvasLayer {
           icon: "fas fa-square",
           name: "DrawGridTool",
           title: "Set grid by drawing either a square or hexagon",
+          button: true,
           onClick: gridScaler.setupDrawGrid
         },
         {
           icon: "fas fa-th",
           name: "Draw3x3Tool",
           title: "Set grid by drawing a 3x3 box",
+          button: true,
           onClick: gridScaler.setupDraw3X3
         },
         {
           icon: "fas fa-ruler-horizontal",
           name: "AdjustXTool",
           title: "Set the X position of the grid",
+          button: true,
           onClick: gridScaler.setupAdjustX
         },
         {
           icon: "fas fa-ruler-vertical",
           name: "AdjustYTool",
           title: "Set the Y position of the grid",
+          button: true,
           onClick: gridScaler.setupAdjustY
         },
         {
@@ -236,12 +240,14 @@ class ScaleGridLayer extends CanvasLayer {
   // <================== Start Setup Functions  ====================>
 
   setupAdjustX() {
+    ui.notifications.info("Click on a point to set up the X position of your grid");
     console.log("Grid Scale | Drawing Layer | Running AdjustX")
     gridScaler.currentTool = "AdjustXTool"
     gridScaler.addListeners();
   }
 
   setupAdjustY() {
+    ui.notifications.info("Click on a point to set up the Y position of your grid");
     console.log("Grid Scale | Drawing Layer | Running AdjustY")
     gridScaler.currentTool = "AdjustYTool"
     gridScaler.addListeners();
@@ -258,16 +264,19 @@ class ScaleGridLayer extends CanvasLayer {
   }
 
   setupDrawSquare() {
+    ui.notifications.info("Click and drag your mouse to draw a square");
     gridScaler.currentTool = "DrawSquareTool"
     gridScaler.initializeDrawGrid();
   }
 
   setupDrawHex() {
+    ui.notifications.info("Click and drag your mouse to draw an hexagon");
     gridScaler.currentTool = "DrawHexTool"
     gridScaler.initializeDrawGrid();
   }
 
   setupDraw3X3() {
+    ui.notifications.info("Click and drag your mouse to draw a box of 3 squares");
     gridScaler.currentTool = "Draw3x3Tool"
     gridScaler.initializeDrawGrid();
   }
