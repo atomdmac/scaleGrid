@@ -147,7 +147,7 @@ export class gridUtils {
 
     // Update the grid layer
     if (grid) {
-      GridLayer.draw({
+      canvas.interface.grid.draw({
         dimensions: d,
         color: color.replace("#", "0x"),
         alpha: alpha
