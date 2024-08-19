@@ -149,7 +149,7 @@ export class gridUtils {
     if (grid) {
       canvas.interface.grid.draw({
         dimensions: d,
-        color: color.replace("#", "0x"),
+        color: color.fromString(color.toString().replace("#", "0x")),
         alpha: alpha
       });
 
