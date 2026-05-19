@@ -12,19 +12,10 @@ export class gridUtils {
   // CANVAS UTILS
   ////////////////////////////////////////////////////
   static getMousePos(evt) {
-    let result = null;
-
     if (evt) {
-      result = evt.data.getLocalPosition(canvas.app.stage)
-    } else {
-      // Older Foundry versions use the first case, newer versions (>v11) use the second.
-      const interaction = canvas.app?.plugins?.interaction || canvas.app?.renderer?.plugins?.interaction;
-      // Older versions of Foundry use mouse, newer versions (>v10) use pointer
-      const pointer = interaction?.mouse || interaction?.pointer || canvas.app.renderer.events.pointer;
-      result = pointer.getLocalPosition(canvas.app.stage);
+      return evt.getLocalPosition(canvas.app.stage);
     }
-
-    return result;
+    return canvas.app.renderer.events.pointer.getLocalPosition(canvas.app.stage);
   }
 
   // GRID UTILS
@@ -147,24 +138,12 @@ export class gridUtils {
 
     // Update the grid layer
     if (grid) {
-      // V13 approach
-      if (canvas.interface?.grid?.draw) {
-        canvas.interface.grid.draw({
-          dimensions: d,
-          size: d.size,
-          color: color,
-          alpha: alpha
-        });
-      } 
-      // Fallback to V12
-      else {
-        canvas.interface.grid.mesh.initialize({
-          dimensions: d,
-          size: d.size,
-          color: Color.fromString(color.toString().replace("#", "0x")),
-          alpha: alpha
-        });
-      }
+      canvas.interface.grid.draw({
+        dimensions: d,
+        size: d.size,
+        color: color,
+        alpha: alpha
+      });
 
       canvas.stage.hitArea = d.rect;
     }

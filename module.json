@@ -2,10 +2,10 @@
 	"id": "scaleGrid",
 	"title": "Grid Scaler",
 	"description": "A set of tools to quickly match the scene grid to your map's grid. Works with both squares and hexes.",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"compatibility": {
-		"minimum": 13,
-		"verified": "13"
+		"minimum": 14,
+		"verified": "14"
 	},
 	"authors": [
 		{
@@ -20,6 +20,9 @@
 		},
 		{
 			"name": "TheGoodwin"
+		},
+		{
+			"name": "MrTheBino"
 		}
 	],
 	"esmodules": [

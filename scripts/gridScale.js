@@ -9,57 +9,20 @@ When working on the grid, you generally want to access 'canvas.grid'. That's goi
 a different object depending on which type of grid is currently selected; SquareGrid, HexagonalGrid,
 or BaseGrid (gridless). 'canvas.grid' is the GridLayer, which we don't deal with here.
 
-There's also 'scene.grid' (v10+ only) which is a basic summary data object which we don't need.
-Oh, and there's 'scene.data.grid' (v9- only), but that's the grid cell *size*, not the grid object. 
-Ignore.
-
 DIMENSIONS
-The scene grid is split into outer and inner panels, with the inner panel set inside and offset 
+The scene grid is split into outer and inner panels, with the inner panel set inside and offset
 from the outer panel (usually centered).
 
 - 'canvas.grid.options' to get the dimensions and other information about the grid
 - 'canvas.dimensions' is a shortcut for 'canvas.grid.options.dimensions'
 
-Properties (v10):
-  - alpha: 0.45
-  - color: "0xff09c1"
-  - columnar: false
-  - dimensions:
-    - distance: 5
-    - height: 1139 (outer panel)
-    - maxR: 1811.017669709492
-    - ratio: 1.073482428115016 (sceneWidth / sceneHeight)
-    - rect: {x: 0, y: 0, width: 1408, height: 1139, type: 1} (outer panel)
-    - sceneHeight: 939 (inner panel)
-    - sceneRect: {x: 200, y: 100, width: 1008, height: 939, type: 1} (inner panel)
-    - sceneWidth: 1008 (inner panel)
-    - sceneX: 200 (left inner panel offest from left outpanel)
-    - sceneY: 100 (top inner panel offest from top outpanel)
-    - size: 100 (grid cell size)
-    - width: 1408 (outer panel)
-  - even: false
-  - legacy: undefined
-
-Properties (v9):
-  - alpha: 1
-  - ​color: "0xf4ff20"
-  - ​columns: false
-  - ​dimensions:
-    - ​​distance: 5
-    - ​​height: 2336 (outer panel)
-    - ​​maxR: 4708.358525006353
-    - ​​paddingX: 700 ((width - sceneWidth) / 2)
-    - ​​paddingY: 400 ((height - sceneHeight) / 2)
-    - ​​ratio: 1.75 (width / height)
-    - ​​rect: { x: 0, y: 0, width: 4088, … } (outer panel)
-    - ​​sceneHeight: 1536 (inner panel)
-    - ​​sceneRect: { x: 700, y: 400, width: 2688, … } (inner panel)
-    - ​​sceneWidth: 2688 (inner panel)
-    - ​​shiftX: 0 (left inner panel offest from left outpanel)
-    - ​​shiftY: 0 (top inner panel offest from top outpanel)
-    - ​​size: 100 (grid cell size)
-    - width: 4088 (outer panel)
-  - ​even: false
+Key canvas.dimensions properties:
+  - sceneHeight: (inner panel height)
+  - sceneRect: {x, y, width, height} (inner panel rect)
+  - sceneWidth: (inner panel width)
+  - sceneX: (left inner panel offset from left outer panel)
+  - sceneY: (top inner panel offset from top outer panel)
+  - size: (grid cell size)
 
 UPDATING (without saving)
 Saving grid changes takes time and makes the screen flash, so when we want to make temporary
@@ -753,7 +716,7 @@ class ScaleGridLayer extends CanvasLayer {
 
   async openGridMoveDialog() {
     const templatePath = 'modules/scaleGrid/templates/gridMove.html';
-    const html = await renderTemplate(templatePath, null);
+    const html = await foundry.applications.handlebars.renderTemplate(templatePath, null);
     let offsetX = 0;
     let offsetY = 0;
 
@@ -761,19 +724,32 @@ class ScaleGridLayer extends CanvasLayer {
     gridScaler.cavasGridTempSettings[canvas.scene.id] = null;
     gridScaler.toggleGrid();
 
-    new Dialog({
-      title: "Move and Scale Grid ",
+    // In V14, canvas.dimensions.sceneX is pure padding and does not include
+    // background.offsetX, but the background sprite is positioned at
+    // sceneX + background.offsetX. Sync them so refreshGrid's bg.position.set()
+    // starts from the correct position instead of jumping on first button press.
+    const bgSprite = canvas.primary?.background;
+    if (bgSprite) {
+      canvas.dimensions.sceneX = bgSprite.position.x;
+      canvas.dimensions.sceneY = bgSprite.position.y;
+    }
+
+    foundry.applications.api.DialogV2.wait({
+      window: { title: "Move and Scale Grid" },
       content: html,
-      buttons: {
-        save: {
-          icon: '<i class="fas fa-save"></i>',
+      buttons: [
+        {
+          type: "button",
+          action: "save",
           label: "Save Changes",
-          callback: async _ => {
+          icon: "fas fa-save",
+          default: true,
+          callback: async (event, button, dialog) => {
             let sceneWidth = canvas.dimensions.sceneWidth;
             let sceneHeight = canvas.dimensions.sceneHeight;
             let gridSize = canvas.dimensions.size;
 
-            // If the grid size ends up being less than 50 we need to make it 50 and adjust 
+            // If the grid size ends up being less than 50 we need to make it 50 and adjust
             // the scene (map) size to compensate. Foundry doesn't accept grid sizes less than 50.
             if (gridSize < 50) {
               gridUtils.logOperation("Adjusting grid size", gridSize)
@@ -794,71 +770,61 @@ class ScaleGridLayer extends CanvasLayer {
             });
           }
         },
-        reset: {
-          icon: '<i class="fas fa-sync"></i>',
+        {
+          type: "button",
+          action: "reset",
           label: "Discard Changes",
-          callback: async _ => {
+          icon: "fas fa-sync",
+          callback: async (event, button, dialog) => {
             await canvas.draw();
           }
         }
-      },
-      default: "save",
-      render: html => {
+      ],
+      render: (event, dialog) => {
         let interval;
+        const element = dialog.element;
 
-        html.find("#move-right").mousedown(() => {
+        element.querySelector("#move-right").addEventListener("mousedown", () => {
           interval = setInterval(() => {
             offsetX -= 1;
             gridUtils.refreshGrid({ background: true, offsetX: -1, offsetY: 0, offsetSize: 0 })
           }, 50);
         });
-        html.find("#move-left").mousedown(() => {
+        element.querySelector("#move-left").addEventListener("mousedown", () => {
           interval = setInterval(() => {
             offsetX += 1;
             gridUtils.refreshGrid({ background: true, offsetX: 1, offsetY: 0, offsetSize: 0 })
           }, 50);
         });
-        html.find("#move-up").mousedown(() => {
+        element.querySelector("#move-up").addEventListener("mousedown", () => {
           interval = setInterval(() => {
             offsetY += 1;
             gridUtils.refreshGrid({ background: true, offsetX: 0, offsetY: 1, offsetSize: 0 })
           }, 50);
         });
-        html.find("#move-down").mousedown(() => {
+        element.querySelector("#move-down").addEventListener("mousedown", () => {
           interval = setInterval(() => {
             offsetY -= 1;
             gridUtils.refreshGrid({ background: true, offsetX: 0, offsetY: -1, offsetSize: 0 })
           }, 50);
         });
-        html.find("#expand-grid").mousedown(() => {
+        element.querySelector("#expand-grid").addEventListener("mousedown", () => {
           interval = gridScaler.repeatResizeGridWithBackgroundOffset(1);
         });
-        html.find("#contract-grid").mousedown(() => {
+        element.querySelector("#contract-grid").addEventListener("mousedown", () => {
           interval = gridScaler.repeatResizeGridWithBackgroundOffset(-1);
         });
-        html.find("#move-right").mouseup(() => {
-          clearInterval(interval);
-        });
-        html.find("#move-left").mouseup(() => {
-          clearInterval(interval);
-        });
-        html.find("#move-up").mouseup(() => {
-          clearInterval(interval);
-        });
-        html.find("#move-down").mouseup(() => {
-          clearInterval(interval);
-        });
-        html.find("#expand-grid").mouseup(() => {
-          clearInterval(interval);
-        });
-        html.find("#contract-grid").mouseup(() => {
-          clearInterval(interval);
+
+        const clearOnMouseUp = () => clearInterval(interval);
+        ["#move-right", "#move-left", "#move-up", "#move-down", "#expand-grid", "#contract-grid"].forEach(selector => {
+          element.querySelector(selector).addEventListener("mouseup", clearOnMouseUp);
         });
       },
-      close: () => {
+      close: (event, dialog) => {
         gridScaler.toggleGrid();
-      }
-    }).render(true);
+      },
+      rejectClose: false
+    });
   }
 
   // We want the background to stay relative to the grid cell it started in as the grid size is changing.
@@ -905,52 +871,49 @@ class ScaleGridLayer extends CanvasLayer {
   // Renders a dialog that lets the user enter known X/Y values.
   async openGridSizeDialog() {
     const templatePath = 'modules/scaleGrid/templates/known-xy.html';
-    const html = await renderTemplate(templatePath, null);
+    const html = await foundry.applications.handlebars.renderTemplate(templatePath, null);
+    let gridCountEl;
 
-    new Dialog({
-      title: "Set Grid Size ",
+    foundry.applications.api.DialogV2.prompt({
+      window: { title: "Set Grid Size" },
       content: html,
-      buttons: {
-        create: {
-          icon: '<i class="fas fa-check"></i>',
-          label: "OK",
-          callback: async html => {
-            const form = html.find('#grid-scaler-set-grid')[0];
-            const gridCount = parseFloat(form.querySelector("#grid-count").value);
-            const gridSize = await gridUtils.getGridSizeByCount(gridCount);
+      ok: {
+        icon: "fas fa-check",
+        label: "OK",
+        callback: async (event, button, dialog) => {
+          const gridCount = parseFloat(gridCountEl.value);
+          const gridSize = await gridUtils.getGridSizeByCount(gridCount);
 
-            if (gridSize > 0) {
-              await gridScaler.setGridSize(gridSize);
-            }
+          if (gridSize > 0) {
+            await gridScaler.setGridSize(gridSize);
           }
         }
-      }
-    }).render(true);
+      },
+      render: (event, dialog) => {
+        gridCountEl = dialog.element.querySelector("#grid-count");
+      },
+      rejectClose: false
+    });
   }
 
   resetDialog(_) {
-    const confirmDialog = new Dialog({
-      height: 800,
-      width: 800,
-      title: "Reset grid?",
+    foundry.applications.api.DialogV2.confirm({
+      window: { title: "Reset grid?" },
       content: "<p>Reset grid to defaults?</p>",
-      buttons: {
-        yes: {
-          icon: `<i class="fas fa-check"></i>`,
-          label: "Reset",
-          callback: () => {
-            gridScaler.resetGrid();
-          }
-        },
-        no: {
-          icon: `<i class="fas fa-times"></i>`,
-          label: "Cancel"
+      yes: {
+        icon: "fas fa-check",
+        label: "Reset",
+        callback: () => {
+          gridScaler.resetGrid();
         }
       },
-      default: "no"
+      no: {
+        icon: "fas fa-times",
+        label: "Cancel"
+      },
+      defaultYes: false,
+      rejectClose: false
     });
-
-    confirmDialog.render(true);
   }
 
   // <================== Toggle Grid  ====================>
